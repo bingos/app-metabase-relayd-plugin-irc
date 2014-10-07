@@ -54,7 +54,7 @@ sub irc_001 {
 sub _get_channels {
   my $channels = shift;
   my @channels;
-  unless ( $channels ) { 
+  unless ( $channels ) {
     push @channels, '#relayd';
   }
   else {
@@ -65,7 +65,15 @@ sub _get_channels {
 
 sub mbrd_received {
   my ($kernel,$heap,$data,$ip) = @_[KERNEL,HEAP,ARG0,ARG1];
-  my $msg = join(' ', uc($data->{grade}), ( map { $data->{$_} } qw(distfile archname osversion) ), "perl-" . $data->{perl_version} );
+  use Time::Piece;
+  my $stamp = '[ ';
+  {
+    my $t = localtime;
+    $stamp .= join ' ', $ip, $t->strftime("%Y-%m-%dT%H:%M:%S");
+  }
+  $stamp .= ' ]';
+  my $t = localtime; my $ts = $t->strftime("%Y-%m-%dT%H:%M:%S");
+  my $msg = join(' ', uc($data->{grade}), ( map { $data->{$_} } qw(distfile archname osversion) ), "perl-" . $data->{perl_version}, $stamp );
   $heap->{_irc}->yield( 'privmsg', $_, $msg ) for _get_channels( $heap->{channels} );
   return;
 }
@@ -90,14 +98,14 @@ qq[Smokey IRC];
   # example metabase-relayd configuration file
 
   [IRC]
-  
+
   server = my.irc.server
   nick = myrelayd
-  
+
 
 =head1 DESCRIPTION
 
-App::Metabase::Relayd::Plugin::IRC is an IRC plugin for L<App::Metabase::Relayd> and 
+App::Metabase::Relayd::Plugin::IRC is an IRC plugin for L<App::Metabase::Relayd> and
 L<metabase-relayd> that announces on IRC channels when reports are received by the daemon.
 
 Configuration is handled by a section in the L<metabase-relayd> configuration file.
