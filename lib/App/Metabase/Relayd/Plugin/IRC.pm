@@ -32,7 +32,7 @@ sub _start_up {
   my ($kernel,$heap) = @_[KERNEL,HEAP];
   $heap->{nick} = 'relayd' . $$ unless $heap->{nick};
   my $irc = POE::Component::IRC->spawn(
-    ( map { ( $_, $heap->{$_} ) } grep { exists $heap->{$_} } qw(server nick ircname username port password) ),
+    ( map { ( $_, $heap->{$_} ) } grep { exists $heap->{$_} } qw(server nick ircname username port password flood) ),
   );
   $heap->{_irc} = $irc;
   return;
@@ -148,6 +148,13 @@ The password that is required if your ircd is restricted.
 =item C<channels>
 
 A comma-separated list of IRC channels to join, default is C<#relayd>
+
+=item C<flood>
+
+Set to a C<true> value to disable anti-flood protection when sending stuff to
+the ircd. Defaults to C<false> if not specified. Care should be used when enabling
+this option and it requires the cooperation of a friendly irc oper to ensure that
+disconnects and k-lines are not the side-effects of enabling this option.
 
 =back
 
