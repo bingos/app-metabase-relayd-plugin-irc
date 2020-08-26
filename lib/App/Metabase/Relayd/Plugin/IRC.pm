@@ -73,7 +73,7 @@ sub mbrd_received {
   }
   $stamp .= ' ]';
   my $t = localtime; my $ts = $t->strftime("%Y-%m-%dT%H:%M:%S");
-  my $msg = join(' ', uc($data->{grade}), ( map { $data->{$_} } qw(distfile archname) ), "perl-" . $data->{perl_version}, $data->{osversion}, $stamp );
+  my $msg = join(' ', uc($data->{grade}), $data->{distfile}, 'perl-' . $data->{perl_version}, ( map { $data->{$_} } qw(archname osversion) ), $stamp );
   $heap->{_irc}->yield( 'privmsg', $_, $msg ) for _get_channels( $heap->{channels} );
   return;
 }
